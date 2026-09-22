@@ -326,9 +326,37 @@ def run_agent(openai, agent, text):
     return response.output_text
 
 
+
+
+def print_routing() -> None:
+    """Show the language decision for each report. Pure Python - no Azure, no cost."""
+    banner("MOTHERWELL  ·  routing",
+           "language follows the mother, not the developer")
+    reports = json.loads(REPORTS_PATH.read_text())["reports"]
+    print(f"\n  {'REPORT':<9}{'MOTHER':<11}{'REGION':<16}{'LANGUAGE':<13}DECIDED BY")
+    print("  " + "-" * (W - 4))
+    for r in reports:
+        lang, why = detect_language(chosen=r.get("language", ""),
+                                    locale=r.get("locale", ""),
+                                    phone=r.get("phone", ""),
+                                    region=r.get("region", ""),
+                                    clinic_region=r.get("clinic_region", ""))
+        print(f"  {r['report_id']:<9}{r['mother']:<11}{r.get('region', '-'):<16}{lang:<13}{why}")
+    print("  " + "-" * (W - 4))
+    print("\n  Signals, strongest first:")
+    print("    1. she chose it     2. device locale     3. phone country code")
+    print("    4. her region       5. clinic region     6. English")
+    print("\n  IP geolocation is deliberately not used: less accurate than the")
+    print("  device locale, and personal data under DPDP and GDPR.\n")
+
+
 def main():
     if "--languages" in sys.argv:
         print_language_table()
+        return
+
+    if "--routing" in sys.argv:
+        print_routing()
         return
 
     if "--tool-only" in sys.argv:
