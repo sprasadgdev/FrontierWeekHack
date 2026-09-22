@@ -1,8 +1,10 @@
 {
   "reports": [
-    {"report_id": "R-001", "mother": "Anitha", "week": 24,
+    {"report_id": "R-001", "mother": "Anitha", "week": 24, "region": "Kerala",
+     "locale": "ml-IN",
      "values": {"haemoglobin": 11.8, "fasting_glucose": 84, "tsh": 1.8, "ferritin": 45, "vitamin_d": 32}},
-    {"report_id": "R-002", "mother": "Lakshmi", "week": 24,
+    {"report_id": "R-002", "mother": "Lakshmi", "week": 24, "region": "Bihar",
+     "phone": "+91 9876543210",
      "values": {"haemoglobin": 9.8, "fasting_glucose": 105, "tsh": 2.1, "ferritin": 18, "vitamin_d": 28}}
   ]
 }
