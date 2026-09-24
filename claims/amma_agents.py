@@ -329,6 +329,7 @@ def ungrounded_numbers(text, tool_outputs):
     """Numbers in the Analyser's text that the tool never produced (groundedness check)."""
     allowed = set(re.findall(r"\d+(?:\.\d+)?", " ".join(tool_outputs)))
     allowed |= {n.rstrip("0").rstrip(".") for n in allowed if "." in n}
+    text = re.sub(r"\bR-\d+\b", "", text)   # a report ID such as R-001 is not a clinical number
     found = re.findall(r"\d+(?:\.\d+)?", text)
     def norm(n):
         return n.rstrip("0").rstrip(".") if "." in n else n

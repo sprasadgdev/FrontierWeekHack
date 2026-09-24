@@ -64,6 +64,12 @@ def test_deployed_workflow_input_has_no_names_and_no_in_range_values():
     assert not everything_in_range & numbers(text)
 
 
+def test_groundedness_ignores_the_report_id_but_catches_invented_numbers():
+    out = check_values(REPORTS[1]["values"], REPORTS[1]["week"])
+    assert A.ungrounded_numbers("Report R-002, week 24. Haemoglobin 9.8 g/dL is LOW.", [out]) == []
+    assert A.ungrounded_numbers("Report R-002. Retest in 6 weeks.", [out]) == ["6"]
+
+
 def test_deploy_script_sends_the_contract_not_the_report():
     src = (ROOT / "amma_deploy.py").read_text(encoding="utf-8")
     assert "workflow_input(" in src and "['mother']" not in src
