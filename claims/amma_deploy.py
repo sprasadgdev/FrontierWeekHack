@@ -4,7 +4,7 @@ import sys
 import time
 from pathlib import Path
 
-from amma_agents import (check_values, CHECK_VALUES_TOOL, ANALYSER_INSTRUCTIONS,
+from amma_agents import (workflow_input, CHECK_VALUES_TOOL, ANALYSER_INSTRUCTIONS,
                          PLANNER_INSTRUCTIONS, PROJECT, MODEL, REPORTS_PATH)
 
 from azure.ai.projects import AIProjectClient
@@ -17,25 +17,16 @@ WORKFLOW = "amma-care-workflow"
 
 
 def ensure_agents_deployed():
-    """Both agents already exist from Sep 17 — reuse them, create only if missing."""
-    print("=== Step 1: Ensure agents are deployed ===")
+    """Publish a new version of both agents, so the workflow always runs the instructions
+    in this repo. (Reusing an existing agent would keep its old instructions.)"""
+    print("=== Step 1: Publish the agents ===")
     client = AIProjectClient(endpoint=PROJECT, credential=DefaultAzureCredential())
-    existing = {a.name for a in client.agents.list()}
-
-    if ANALYSER not in existing:
-        client.agents.create_version(agent_name=ANALYSER, definition=PromptAgentDefinition(
-            model=MODEL, instructions=ANALYSER_INSTRUCTIONS, tools=[CHECK_VALUES_TOOL]))
-        print(f"  Deployed: {ANALYSER}")
-    else:
-        print(f"  Found existing: {ANALYSER}")
-
-    if PLANNER not in existing:
-        client.agents.create_version(agent_name=PLANNER, definition=PromptAgentDefinition(
-            model=MODEL, instructions=PLANNER_INSTRUCTIONS))
-        print(f"  Deployed: {PLANNER}")
-    else:
-        print(f"  Found existing: {PLANNER}")
-
+    a = client.agents.create_version(agent_name=ANALYSER, definition=PromptAgentDefinition(
+        model=MODEL, instructions=ANALYSER_INSTRUCTIONS, tools=[CHECK_VALUES_TOOL]))
+    print(f"  Published: {a.name} v{a.version}")
+    p = client.agents.create_version(agent_name=PLANNER, definition=PromptAgentDefinition(
+        model=MODEL, instructions=PLANNER_INSTRUCTIONS))
+    print(f"  Published: {p.name} v{p.version}")
     client.close()
 
 
@@ -84,21 +75,15 @@ def create_workflow_agent():
 
 
 def build_input():
-    """Run check_values in PYTHON first, then hand the tool's exact output to the workflow.
+    """Run check_values in PYTHON first, then hand the workflow only the Planner's view of it.
 
     The portal cannot run Python. The lab works around that by telling the agent to
     analyse raw numbers itself - we do NOT do that, because then the model would be
-    deciding the ranges. Instead the tool runs here and the agents only read its result.
+    deciding the ranges. Instead the tool runs here and the agents only read its flags.
+    Both portal agents share one conversation, so no name and no in-range value is sent.
     """
     reports = json.loads(REPORTS_PATH.read_text())["reports"]
-    blocks = []
-    for r in reports:
-        tool_output = check_values(r["values"], r["week"])       # TOOL RUNS HERE, IN PYTHON
-        blocks.append(f"Report {r['report_id']} for {r['mother']}, week {r['week']}.\n"
-                      f"check_values() returned:\n{tool_output}")
-    return ("The check_values tool has ALREADY been run for each report below and its exact "
-            "output is included. Do NOT call the tool again. Use only these numbers and ranges - "
-            "never state a range of your own.\n\n" + "\n\n".join(blocks))
+    return workflow_input(reports)                               # TOOL RUNS HERE, IN PYTHON
 
 
 def run_workflow(workflow_name):

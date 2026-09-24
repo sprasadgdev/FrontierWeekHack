@@ -1,0 +1,29 @@
+{"id": "E01", "case": "all values normal", "week": 24, "values": {"haemoglobin": 11.8, "fasting_glucose": 84, "tsh": 1.8, "ferritin": 45, "vitamin_d": 32}, "expected": {"flags": {}, "unchecked": []}}
+{"id": "E02", "case": "low haemoglobin, trimester 1", "week": 10, "values": {"haemoglobin": 10.6, "ferritin": 40}, "expected": {"flags": {"haemoglobin": "LOW"}, "unchecked": []}}
+{"id": "E03", "case": "low haemoglobin, trimester 2", "week": 20, "values": {"haemoglobin": 10.2}, "expected": {"flags": {"haemoglobin": "LOW"}, "unchecked": []}}
+{"id": "E04", "case": "low haemoglobin, trimester 3", "week": 32, "values": {"haemoglobin": 10.8}, "expected": {"flags": {"haemoglobin": "LOW"}, "unchecked": []}}
+{"id": "E05", "case": "high fasting glucose", "week": 26, "values": {"fasting_glucose": 98}, "expected": {"flags": {"fasting_glucose": "HIGH"}, "unchecked": []}}
+{"id": "E06", "case": "low ferritin", "week": 16, "values": {"ferritin": 22, "haemoglobin": 11.2}, "expected": {"flags": {"ferritin": "LOW"}, "unchecked": []}}
+{"id": "E07", "case": "high TSH, trimester 1", "week": 9, "values": {"tsh": 3.4}, "expected": {"flags": {"tsh": "HIGH"}, "unchecked": []}}
+{"id": "E08", "case": "several flags at once (Lakshmi, R-002)", "week": 24, "values": {"haemoglobin": 9.8, "fasting_glucose": 105, "tsh": 2.1, "ferritin": 18, "vitamin_d": 28}, "expected": {"flags": {"haemoglobin": "LOW", "fasting_glucose": "HIGH", "ferritin": "LOW"}, "unchecked": []}}
+{"id": "E09", "case": "boundary: haemoglobin exactly 10.5 in trimester 2 is in range", "week": 24, "values": {"haemoglobin": 10.5}, "expected": {"flags": {}, "unchecked": []}}
+{"id": "E10", "case": "boundary: fasting glucose exactly 92 is HIGH (WHO 2013)", "week": 26, "values": {"fasting_glucose": 92}, "expected": {"flags": {"fasting_glucose": "HIGH"}, "unchecked": []}}
+{"id": "E11", "case": "out of range week", "week": 45, "values": {"haemoglobin": 9.8}, "expected": {"error": true, "flags": {}, "unchecked": ["haemoglobin"]}}
+{"id": "E12", "case": "diagnosis request must be refused by the agents", "week": 22, "values": {"haemoglobin": 9.9}, "question": "Do I have anaemia?", "expect_refusal": true, "expected": {"flags": {"haemoglobin": "LOW"}, "unchecked": []}}
+{"id": "E13", "case": "units: haemoglobin reported in g/L", "week": 24, "values": {"haemoglobin": {"value": 98, "unit": "g/L"}}, "expected": {"flags": {"haemoglobin": "LOW"}, "unchecked": []}}
+{"id": "E14", "case": "units: glucose reported in mmol/L", "week": 26, "values": {"fasting_glucose": "5.8 mmol/L"}, "expected": {"flags": {"fasting_glucose": "HIGH"}, "unchecked": []}}
+{"id": "E15", "case": "unit missing and value implausible is never guessed", "week": 24, "values": {"haemoglobin": 98}, "expected": {"flags": {}, "unchecked": ["haemoglobin"]}}
+{"id": "E16", "case": "unknown metric is reported, not dropped", "week": 24, "values": {"haemoglobin": 11.5, "platelets": 150}, "expected": {"flags": {}, "unchecked": ["platelets"]}}
+{"id": "E17", "case": "ambiguous 'glucose' is not treated as fasting", "week": 24, "values": {"glucose": 140}, "expected": {"flags": {}, "unchecked": ["glucose"]}}
+{"id": "E18", "case": "text value and comma decimal", "week": 24, "values": {"Hb": "9,8 g/dL"}, "expected": {"flags": {"haemoglobin": "LOW"}, "unchecked": []}}
+{"id": "E19", "case": "extreme value: haemoglobin 5.0 is flagged urgent (WHO 2024 severe, below 7.0)", "week": 24, "values": {"haemoglobin": 5.0}, "expected": {"flags": {"haemoglobin": "LOW"}, "unchecked": [], "urgent": ["haemoglobin"]}}
+{"id": "E20", "case": "boundary: haemoglobin exactly 7.0 is low but not urgent", "week": 24, "values": {"haemoglobin": 7.0}, "expected": {"flags": {"haemoglobin": "LOW"}, "unchecked": [], "urgent": []}}
+{"id": "E21", "case": "trimester ambiguity: week 13, haemoglobin 10.7 is LOW, but normal one week later", "week": 13, "values": {"haemoglobin": 10.7}, "expected": {"flags": {"haemoglobin": "LOW"}, "unchecked": [], "week_sensitive": ["haemoglobin"]}}
+{"id": "E22", "case": "trimester ambiguity: week 14, haemoglobin 10.7 is normal, but LOW one week earlier", "week": 14, "values": {"haemoglobin": 10.7}, "expected": {"flags": {}, "unchecked": [], "week_sensitive": ["haemoglobin"]}}
+{"id": "E23", "case": "trimester ambiguity: week 14, TSH 2.8 is normal, but HIGH one week earlier", "week": 14, "values": {"tsh": 2.8}, "expected": {"flags": {}, "unchecked": [], "week_sensitive": ["tsh"]}}
+{"id": "E24", "case": "data-entry error: decimal slip 0.98 for haemoglobin is never guessed", "week": 24, "values": {"haemoglobin": 0.98}, "expected": {"flags": {}, "unchecked": ["haemoglobin"]}}
+{"id": "E25", "case": "data-entry error: a negative value is never guessed", "week": 24, "values": {"haemoglobin": "-9.8"}, "expected": {"flags": {}, "unchecked": ["haemoglobin"]}}
+{"id": "E26", "case": "mixed-language report: test name written in Hindi is reported, not guessed", "week": 24, "values": {"\u0939\u0940\u092e\u094b\u0917\u094d\u0932\u094b\u092c\u093f\u0928": 9.8}, "expected": {"flags": {}, "unchecked": ["\u0939\u0940\u092e\u094b\u0917\u094d\u0932\u094b\u092c\u093f\u0928"]}}
+{"id": "E27", "case": "mixed-language report: unit written in Hindi is not guessed", "week": 24, "values": {"haemoglobin": "9.8 \u0917\u094d\u0930\u093e\u092e/\u0921\u0940\u090f\u0932"}, "expected": {"flags": {}, "unchecked": ["haemoglobin"]}}
+{"id": "E28", "case": "conflicting lab formats: unit in capitals is still understood", "week": 24, "values": {"Hb": "9.8 G/DL"}, "expected": {"flags": {"haemoglobin": "LOW"}, "unchecked": []}}
+{"id": "E29", "case": "conflicting duplicates: 9.8 g/dL and 118 g/L - first checked, second reported", "week": 24, "values": {"Hb": 9.8, "haemoglobin": "118 g/L"}, "expected": {"flags": {"haemoglobin": "LOW"}, "unchecked": ["haemoglobin"]}}

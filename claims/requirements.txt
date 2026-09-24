@@ -1,0 +1,8 @@
+# Foundry agents. The deterministic tool and its tests need none of these.
+azure-ai-projects
+azure-identity
+openai
+python-dotenv
+
+# Tests only
+pytest
